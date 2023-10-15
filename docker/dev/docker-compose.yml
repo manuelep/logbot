@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  botgram:
+    container_name: botgram-bot
+    build:
+      context: ../..
+      dockerfile: docker/dev/Dockerfile
+      args:
+        - UNAME=${ENVUSER}
+        - BOT_TOKEN=${BOT_TOKEN}
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+    # restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - ../..:/home/${ENVUSER}/botgram:r
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -U -e ./${APP_NAME}
+        python3 -m botgram.bot
+        # sleep infinity
+        # run-botgram
