@@ -2,8 +2,29 @@ version: '3.8'
 
 services:
 
+  storage:
+    container_name: log-db
+    build:
+      context: ../..
+      dockerfile: docker/storage.Dockerfile
+    # restart: unless-stopped
+    environment:
+      DBPORT: ${DBPORT}
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+      DBNAME: ${DBNAME}
+      DBUSERNAME: ${DBUSERNAME}
+      DBUSERPASSWORD: ${DBUSERPASSWORD}
+      DBNET: ${DBNET}
+    ports:
+      - "5432:${DBPORT}"
+    networks:
+      default:
+        aliases:
+          - ${DBNET}
+
   botgram:
-    container_name: botgram-bot
+    container_name: log-bot
     build:
       context: ../..
       dockerfile: docker/dev/Dockerfile
@@ -12,6 +33,12 @@ services:
         - BOT_TOKEN=${BOT_TOKEN}
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
+      DBNET: ${DBNET}
+      DBNAME: ${DBNAME}
+      DBUSERNAME: ${DBUSERNAME}
+      DBUSERPASSWORD: ${DBUSERPASSWORD}
+      DBPORT: ${DBPORT}
+      DB_MIGRATE: ${DB_MIGRATE}
     # restart: unless-stopped
     stdin_open: true
     tty: true
@@ -23,6 +50,6 @@ services:
       - |
         python3 -m pip install --upgrade pip
         python3 -m pip install -U -e ./${APP_NAME}
-        python3 -m botgram.bot
+        python3 -m logbot.bot
         # sleep infinity
         # run-botgram

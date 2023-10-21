@@ -17,7 +17,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "aiogram == 3.1.1"
+    "aiogram == 3.1.1",
+    "pydal",
+    "psycopg2-binary",
+    "python-dotenv"
 ]
 
 # [project.urls]
@@ -25,4 +28,4 @@ dependencies = [
 # "Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
 
 [project.scripts]
-run-botgram = "botgram.bot:run"
+run-botgram = "logbot.bot:run"

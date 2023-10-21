@@ -5,6 +5,7 @@ Packaging instruction [here](https://packaging.python.org/en/latest/tutorials/pa
 ## Build command
 
 ```sh
+cd docker/dev
 docker compose --env-file ../.env build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
 ```
 

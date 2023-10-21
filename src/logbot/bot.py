@@ -13,6 +13,9 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 from aiogram.utils.token import TokenValidationError
 
+from .filters import DebugLevelFilter
+from .bot_utils import _start_handler, _level_handler
+
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = settings.BOT_TOKEN
 
@@ -30,8 +33,34 @@ async def command_start_handler(message: Message) -> None:
     # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
     # method automatically or call API method directly via
     # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
+    # db.chat.insert(chat_id = message.chat.id)
 
+    try:
+        uid = _start_handler(message.chat.id)
+    except Exception as err:
+        await message.answer(f"Error, {err}!")
+    else:
+        if uid:
+            await message.answer(f"Welcome, {hbold(message.from_user.full_name)}!")
+        else:
+            await message.answer(f"Welcome back, {hbold(message.from_user.full_name)}!")
+    
+@dp.message(DebugLevelFilter())
+async def command_level_handler(message: Message, level: str) -> None:
+    """ """
+    try:
+        result = _level_handler(message.chat.id, getattr(logging, level.upper()))
+    except Exception as err:
+        await message.answer(f"Error, {err}!")
+    else:
+        if result is None:
+            await message.answer("No user founf to update")
+        else:
+            await message.answer(f"Your log level now is {level.upper()}")
+
+
+# @dp.message()
+# async def 
 
 @dp.message()
 async def echo_handler(message: types.Message) -> None:
@@ -46,6 +75,7 @@ async def echo_handler(message: types.Message) -> None:
     except TypeError:
         # But not all the types is supported to be copied so need to handle it
         await message.answer("Nice try!")
+    breakpoint()
 
 
 async def main() -> None:
